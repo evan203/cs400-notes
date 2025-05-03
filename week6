@@ -1,0 +1,179 @@
+graphs!
+
+Graphs consist of
+  Set of nodes (or vertices)
+  Set of links (or edges)
+Two nodes connected with direct edge are
+  Neighbors or adjacent nodes
+
+Two types of Graphs:
+  Undirected: //TODO
+  Directed:   //TODO
+
+Degree of a node:
+  The number of edges connected to a node
+
+Paths in a Graph: 
+  Cycle: A path that returns to a previously visited node
+  Cyclic graph: contains at least one cycle
+  Acyclic graph: contains no cycle
+
+Adjacency Matrix // TODO 
+
+Adjacency List   // TODO
+
+Implementation of Graphs: Either:
+  boolean[][] adjacencyMatrix and Map<T, Integer> nodeIndecies 
+  OR 
+  Map<T, Graphnode<T>> vertexTable; 
+  Graphnode<T>: {T data, List<Graphnode<T> adjacencyList}
+
+====================
+Graph Traversals 
+
+Goal: Traverse graph by crossing edges to visit each node exactly once
+
+Points to consider
+  need to pick starting node
+  nodes might be unreachable from starting node
+  cycles can lead to infinite loops
+
+Detecting Cycles
+  Detect cycles to avoid visiting nodes multiple times
+  Strategy: check if node is unvisited before visiting it
+    need to keep track of visited nodes:
+    either with Boolean field in node type, or
+    additional data structure to keep track of visited nodes
+
+Depth First Traversal 
+  Assume all verticies are marked unvisited at start. 
+  DFT(V):
+    mark v as visited
+    for each neighbor u of v:
+      if u is unvisited: DFT(U)
+
+  To implement this strategy we need a helper data structure (stack) to backtrack
+  Method call stack is used with recursive implementation above.
+
+  Example from slide 6 of Graph-Traversals.pdf.
+    first call is DFT(A):
+      mark and add A to visited
+      then the loop of adj nodes: DFT(B), DFT(C), DFT(D)
+    second call is DFT(B):
+      mark and add B to visited 
+      then: DFT(C)
+    next call is DFT(C):
+      mark and add C to visited 
+      then: DFT(E)
+    next DFT(E):
+      mark and add E to visited 
+      then DFT(F), DFT(G), DFT(H)
+    next DFT(F):
+      mark and add F to visited 
+      then DFT(J)
+    next DFT(J):
+      mark and add J to visted
+      finally we terminate DFT(J), DFT(F) -> parent call DFT(E) has 2 more calls
+    next DFT(G):
+      mark and add G to visited 
+      then DFT(H)
+    next DFT(H):
+      mark and add H to visited
+      we terminate DFT(H), DFT(G), DFT(E), DFT(C), DFT(B) -> DFT(A) has 1 call left 
+    next DFT(D):
+      mark and add A to visited 
+      terminte DFT(D)
+    our stack is now empty and we are done. 
+    visited: [A, B, C, E, F, J, G, H, D]
+
+
+Breadth First Traversal
+  Assume are verticies are marked unvisited at start.
+  BFT(v):
+    q = new Queue() 
+    mark v as visited
+    q.enqueue(v)
+    while (!q.isEmpty()):
+      c = q.dequeue()
+      for each neighbor u of c: 
+        if u is unvisited:
+          mark v as visited 
+          q.enqueue(u)
+
+  Example from slide 8 of Graph-Traversals.pdf
+    First BFT(A):
+      mark and add A to visited 
+      enqueue A 
+      while iteration 1:
+        dequeue A
+        for unvisited neighbors of A:
+          mark and add B as visited
+          enqueue B 
+          mark and add C as visited 
+          enqueue C 
+          mark and add D as visited 
+          enqueue D
+      while iteration 2: (queue = B, C, D)
+        dequeue B
+        for unvisited neighbors of B:
+          there are none, terminate.
+      while iteration 3: (queue = C, D) 
+        dequeue C 
+        for unvisited neighbors of C:
+          mark and add E as visited 
+          enqueue E
+      while iteration 4: (queue = D, E)
+        dequeue D
+        for unvisited neighbors of D:
+          mark and add F to visited 
+          enqueue F 
+      while iteration 5: (queue = E, F)
+        dequeue E
+        for unvisited neighbors of E:
+          mark and add G to visited 
+          enqueue G 
+          mark and add H as visited 
+          enqueue H
+      while iteration 6: (queue = F, G, H)
+        dequeue F
+        for unvisited neighbors of F:
+          mark and add J to visited 
+          enqueue J 
+      while iteration 7: (queue = G, H, J)
+        dequeue G 
+        for unvisited neighbors of G:
+          none -> terminate
+      while iteration 8: (queue = H, J)
+        dequeue H
+        for unvisited neighbors of H:
+          none -> terminate
+      while iteration 9: (queue = J)
+        dequeue J 
+        for unvisited neighbors of J:
+          none -> terminate
+      queue is empty -> while loop terminates
+
+    visited = [A, B, C, D, E, F, G, H, J]
+
+Graph Traversal Time Complexity
+  V = nodes in graph 
+  E = edges in graph
+
+  Depth First: 
+    Adj matrix: O(V^2) 
+      matrix requires stepping through all columns in a row to find adj -> for each V calls of DFT(V), for loop iterates V times
+    Adj list  : O(V+E) 
+      list gives us access at every node to edges of every node -> for each of the V calls of DFT(V), for loop run E times 
+
+  Breadth First: 
+    Adj matrix: O(V^2)
+      while loop runs V iterations, bc every node is pushed exactly once to queue, nested for loop iterates V times
+    Adj list  : O(V+E)
+      while loop runs V iterations, bc every node is pushed exactly once to queue, nested for loop iterates E times
+
+
+
+
+
+
+

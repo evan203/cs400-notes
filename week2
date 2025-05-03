@@ -1,0 +1,258 @@
+cs400 week 2 notes: 
+
+Red-Black trees: 
+BSTs that stay balanced
+all nodes are either red or black 
+the root node is black 
+no red nodes have red children 
+every path from root to a null child has the same number of back nodes
+null children are black. 
+
+
+Inserting into a redblack trees
+insert a new value using bst insert algo
+color the node red 
+check red black tree properties; use repair procedure to restore redblack tree property 
+
+after insert attention must be paid to the following when inserting a red note: 
+the root node has to be black 
+no red notes can have red children  
+
+repair operation on a red root: switch the color of the red root to black 
+
+repair operation on a red node with red child: 
+2 operations to choose from: 
+if the two red notes are one branch, examine a seperate sibling branch 
+  this node is called the aunt, which is a siblibg of the parent node of the red node 
+  if the aunt is black (or null): rotate and color swap. 
+  if the aunt is red, recolor the grandparent, red parent, and aunt, then check the rest of the tree
+  
+example red/red repair operation: 
+    (GP)
+   /    \ 
+ (R)    (B)
+   \
+   (r)
+
+first we rotate R and r: (to align the Rr pair) 
+       (GP)
+      /    \ 
+    (r)    (B)
+   /  
+ (R)
+
+next we rotate r and GP, and (r) becomes black, (GP) becomes red, 
+and redblack tree properties are restored
+    (r)
+  (R)  (GP)
+         (B)
+
+
+RedBlack tree insertion example: 
+insert(7);  - bst insert into root, then color red. check rbt property, find red root node violation(!), so change color
+insert(14);  - bst insert into right child position, then color red. check rbt property: tree is vaild
+        (7)b
+            \
+            (14)r
+insert(18);  - bst insert into right child of 14, then color red. check rbt property: red/red violation!
+        (7)b
+            \
+            (14)r
+               \
+               (18)r
+  insert(18) cont: we need to examine sibling branch, which happens to be null which we consider black. 
+  repair operation is rotation in color swap. 
+  examine that both are right children rotations so the first rotation is not necessary because they are aligned
+  rotation direction is left direction on nodes 7 and 14, so 14 becomes the root and 7 becomes left child 
+  then color swap 7 and 14, 18 stays red
+        (14)b
+       /    \
+    (7)r    (18)r
+
+insert(23); - bst insertion into right child of 18, color red. check rbt property and find r/r violation! 
+        (14)b
+       /    \
+    (7)r    (18)r
+               \
+               (23)r
+  decide which repair operation: color of aunt node is red -> we can recolor
+        (14)r
+       /    \
+    (7)b    (18)b
+               \
+               (23)r
+  after recolor we check rbt properties -> root node is red so we need to repair. 
+  root node repair is change root color to black: 
+        (14)b
+       /    \
+    (7)b    (18)b
+               \
+               (23)r
+  now check rbt properties -> tree is valid. 
+
+  insert(1);  - bst insert to left child of 7, color red. check rbt, tree is valid so do nothing. 
+        (14)b
+       /    \
+    (7)b    (18)b
+    /          \
+  (1)r         (23)r
+
+  insert(11);  - bst insert to right side to seve, color red. check rbt, tree is valid
+         (14)b
+       /       \
+     (7)b       (18)b
+     /   \          \
+ (1)r    (11)r      (23)r
+
+ insert(20); - bst insert into left child of 23, color red. check rbt, red/red violation
+         (14)b
+       /       \
+     (7)b       (18)b
+     /   \          \
+ (1)r    (11)r      (23)r
+                    /
+                  (20)r
+  choose repair operation by examining aunt: aunt is null (black) -> rotate(not aligned to right child, right child), rotate and color swap``
+  rotate to align: node 20, node 23
+         (14)b
+       /       \
+     (7)b       (18)b
+     /   \          \
+ (1)r    (11)r      (20)r
+                       \
+                       (23)r
+  next rotate and color swap node 18 and 20
+             (14)b
+         /           \
+     (7)b            (20)b
+     /   \           /   \
+ (1)r    (11)r   (18)r   (23)r
+  verify rbt after repair operation: root is black, red nodes have no red children: all good 
+
+
+insert(29):
+             (14)b
+         /           \
+     (7)b            (20)b
+     /   \           /   \
+ (1)r    (11)r   (18)r   (23)r
+                            \
+                             (29)r
+then repair red/red by color swapping (18), (20), and (23). 
+             (14)b
+         /           \
+     (7)b            (20)r
+     /   \           /   \
+ (1)r    (11)r   (18)b   (23)b
+                            \
+                             (29)r
+
+  insert(25):
+             (14)b
+         /           \
+     (7)b            (20)r
+     /   \           /   \
+ (1)r    (11)r   (18)b   (23)b
+                            \
+                             (29)r
+                            /
+                          (25)r
+
+    repair: first rotation (25,29)
+             (14)b
+         /           \
+     (7)b            (20)r
+     /   \           /   \
+ (1)r    (11)r   (18)b   (23)b
+                            \
+                             (25)r
+                                 \
+                                 (29)r
+
+    repair: second rotation(23,25), color swap(23,25)
+             (14)b
+         /           \
+     (7)b            (20)r
+     /   \           /   \
+ (1)r    (11)r   (18)b   (25)b
+                         /   \
+                     (23)r    (29)r
+
+
+========
+continued, second lecture 3 Feb 2025. 
+
+insert(27);
+
+27 becomes left child of 29. 
+aunt is red, so we recolor. 
+23 becomes black, 25 becomes red, 29 becomes black, 27 stays red
+and subtree looks like the following
+            (14)b
+        /            \
+    (7)b              (20)r
+    /   \             /   \
+(1)r    (11)r    (18)b   (25)r 
+                         /    \
+                     (23)b     (29)b
+                               /
+                             (27)r
+now we have a red/red violation
+the aunt is 7, which is black, so we need to rotate & color swap. 
+14,20 is a right child relationsip and because 20,25 aligns with this,
+the intitial rotation may be skipped, so we 
+rotate left 14,20 then color swap 14,20
+
+              (20)b
+          /             \
+      (14)r              (25)r
+     /     \            /    \
+   (7)b    (18)b    (23)b     (29)b
+   /   \                     /
+(1)r   (11)r              (27)r
+
+========
+
+if we have some java code files, {App.java, Library.java} we can use 
+
+$ javac {App.java,Library.java}
+$ jar -cf library_package.jar Library.class
+
+-c creates a jar file, 
+-f allows us to declare the filename library_package.jar
+
+to merely prove that we aren't using the compiled Library.class, rm it:
+$ rm Library.class
+
+now, to run App.class, we tell java runtime using -cp for classpath
+
+$ java -cp library_package.jar:.
+
+we use the colon seperator to seperate multiple paths. 
+
+example 2: jar both class files: 
+$ javac {App.java,Library.java}
+$ jar -cf app_package.jar App.class Library.class
+
+to run: 
+$ java -cp app_package.jar App
+
+
+to create a jar that runs a class by default entry point, 
+$ jar -cfe app_to_run.jar App App.class Library.class
+
+to run: 
+$ java -jar app_to_run.jar
+
+
+========
+Writing JUnit tester methods
+
+first add an import org.junit.jupiter.api.Test;
+must be a public instance method with a void return type
+with an annotation '@Test'.
+
+@Test
+public void testMyCode() {
+  // todo
+}

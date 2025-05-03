@@ -1,0 +1,26 @@
+week 4 cs400
+Version control - git.
+
+
+AVL Trees: 
+Self balancing bst (alternative to rbt)
+Uses rotations to maintain balane 
+Goal: keep the height of the tree with n nodes growing in O(log(N))
+
+AVL Tree insertion:
+1. Insert a new value using regular BST insertion algo 
+2. Check if tree is out of balance, and rebalance if it is. 
+
+Balance Factor: (bf) = (height_left_subtree) - (height_right_subtree)
+  A node is balanced if abs(bf) < 2 ~= bf < -2 or bf > 2
+  Sign tells us the direction of inbalance
+  A tree is balanced if and only if every node in the tree is balanced. 
+
+Re-Balancing, given the following tree
+(10),-2
+    \
+   (20),-1
+      \
+      (30),0
+
+bf of node (10) is -2, which means it needs to be rebalanced.

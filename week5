@@ -1,0 +1,384 @@
+cs400 week 5: feb 18 to 26. 
+Git, Testing, B-Trees, 2-3-4 trees, Make. 
+
+====================
+
+Working with branches, adding changes to diff branch, then merging.
+
+# create a new git branch and checkout to it: 
+$ git checkout -b BRANCH_NAME
+
+# add all files and create commit:
+$ git commit -a -m 'commit message'
+
+# switch to branch master
+$ git checkout master
+
+# merge non-master branch to master:
+$ git checkout master
+$ git merge BRANCH_NAME
+
+# delete git branch
+$ git branch -d BRANCH_NAME
+
+====================
+
+Handling merge conflicts
+
+if the output of $ git merge BRANCH_NAME
+CONFLICT (content): Merge conflict in {files}
+Automatic merge failed; fix conflicts and then commit the result.
+
+# see which files are unmerged at any point after a merge conflict 
+$ git status
+
+edit the files in a text editor to resolve the merge conflict by removing the unwanted branch's code
+
+# Staging (adding) a merge conflict file to mark it as resolved in Git (after editing file)
+$ git add {file}
+# Finalize the merge commit using 
+$ git commit
+
+
+====================
+
+Working with remotes
+
+# view the URLs that Git has stored for the shortname to be used when reading and writing to remote
+$ git remote -v
+
+# automatically fetch and then merge that remote branch into your current branch
+$ git pull
+
+====================
+
+Undoing git add and git commits, amending commits
+
+Unstaging a Staged File
+# say we stage a file, then decide later that we don't want to stage it for the current commit we're working on
+$ git add FILE
+...
+$ git restore --staged FILE
+# now, FILE is no longer staged for a changes to be commited
+
+Unmodifying a Modified File
+# say we modified a file, but want to restore it to what it was before we changed it (according to the last commit).
+# FILE must be unstaged. 
+$ git restore FILE
+# now, changes made to FILE are discarded
+
+Amending a commit
+# say we staged file(s) with changes and then commited it.
+# now, we want to update this commit with more changes or a diff commit msg.
+$ git commit -m 'initial commit'
+# change files if necessary 
+$ git commit --amend 
+
+
+====================
+
+Makefiles
+
+first we make a rule/target name in a new makefile. in the example, it's 'sayhi'
+then, we add shell commands for the rule to run. 
+
+file: 'Makefile'
+```
+sayhi:
+  echo "Hi Make!"
+```
+
+now, we run the make command, and give the argument of the rule/target name that we want it to run
+
+$ make sayhi
+
+this will list the command that it runs, then show the command output. 
+
+the third part of a makefile we can use is a dependency. 
+when we make a second rule named 'saybye', we say that sayhi is a dependency of this rule. 
+
+file: 'Makefile'
+```
+saybye: sayhi
+  echo "Bye!"
+
+sayhi:
+  echo "Hi Make!"
+```
+
+now, when we run $(make saybye), it will find the saybye rule, 
+see the sayhi dependency, go into sayhi and run its shell commands, 
+then run saybye's shell commands. 
+
+there is a second type of dependency we can use in the makefile. 
+instead of using a dependency as another target, we can list filenames in our dir as deps for a rule. 
+
+below, we have a new rule called someTarget and a dep as the file ClassA.java.
+make will check to make sure this exists in the directory, and the file existing will satisfy the dep.
+
+file: 'Makefile'
+```
+someTarget: ClassA.java
+  echo "ClassA.java exists."
+```
+
+Make rules that have filenames as a dep and the name as the target will check using timestamps 
+will check if the rule name file is older than the dep file: 
+if it is, it will run. 
+if not, it will not run and print that the rule name is up to date.
+
+file 'Makefile':
+```
+ClassA.class: ClassA.java
+  javac ClassA.java
+```
+
+Using make to run compiled code: 
+make will make sure the two files exist and are up to date.. if they either dont exist or aren't up to date, it compiles them. 
+
+file 'Makefile':
+```
+run: ClassA.class ClassB.class
+  java ClassA
+  java ClassB
+```
+
+if we call make without an argument, it will pick the first target in the makefile (the default target)
+
+====================
+
+3 Dimensions for tests. 
+Every test we write falls somewhere on each of these 3 spectrums. 
+
+Unit test: tests just a unit of code.
+Integration test: tests how it interacts with other code. 
+
+Opaque box test: tests a piece of code only relying on publicly avilable members of code
+  Upside: works for classes that implement a given interface; these are flexible tests.
+  Downside: by avoiding internals of code, our test will be less thurough than it could be.
+Clear box test: accesses and uses implementation-specific internals. Ex: root node access for BST
+  Upside: we can write tests that thuroughly, clearly, and fine-grained test the implementation
+  Downside: the tests only work for and run on the single application
+
+Input-output test: tests that rely on and use a very specific, finite input and check for a specific output.
+  Advantage: easier to reproduce conditions if test fails, to help idenfity bug in code.
+  Disadvantage: tests are limited to verifiying just one property; test only gives one piece of evidence 
+  and not as many pieces of evidence as possible to be convinced the implementation has a specific property
+Property test: test that has a randomized input and verifies the result.
+  Advantage: can be run as many times as desired, giving more evidence that the implementation satifies the property
+
+====================
+
+  In BSTs, following a ref to a node requires more memory access (traversing parent->child)
+  If we take our tree stucture and put it on, say, a HDD,
+  memory access operations can be very slow on mass storage devices. 
+
+  So, the goal to avoid this is to keep the number of memory access operations low.
+
+B trees: 
+  make trees shallower by decreasing the num of levels in a tree
+  increase the num of values stored in each node
+  increase the children of node from a max of 2 to a higher count.
+
+B tree example. 
+We use a rectangular shape for nodes in the tree to list different values stored in the node.
+
+root node:             [ 20 | 40 | 60 ]
+                  /         |    |         \
+children [5|10|15]  [25|30|35]  [45|50|55] [70|75|80]
+
+values in each node are sorted. 
+the leftmost subtree (child) must have nodes <20
+the next subtree has nodes >20 and <40
+next subtree has nodes >40 and <60
+the last subtree has nodes >60
+
+
+search algorithm: example: search(75)
+  first we look at the root. we look at each value left to right, first 20, then 40, then 60. 
+  we see if the value is smaller than the search target, 75.
+  since 60<75, we know we need to look at the fourth (last) subtree.
+  now, we repeat this algo on this node. first look at 70, then 75, and here we have a match, so the algo terminates.
+
+B trees are:
+  search trees: values are ordered in node, children are ordered 
+  height H = num of nodes on path from root to deepest leaf 
+  self balancing: height grows in O(log(N)) (B in 'B tree' means balanced)
+    1. all leaves must be on the same level.
+    2. all internal nodes must have (# of values)+1 children.
+    3. insertions can only happen into leaf nodes.
+    4. B trees grow (add new level) from the root upwards.
+
+B Tree Internal Node Types: 
+
+2-node: 1 value,  2 children.
+3-node: 2 values, 3 children 
+4-node: 3 values, 4 children
+
+====================
+2-3-4 trees are: 
+  B trees with 2-nodes, 3-nodes, and 4-nodes
+
+Insertion algorithm: 
+  1. Perform search for value to find leaf to insert into
+    for every full node on path to and including the leaf during search:
+      split node (pre-emptive split) and
+      continue search at parent but don't split it even if it is now full 
+  2. Insert new value into leaf at end of search
+
+
+Insertion example. Insert 7, 14, 18 into empty tree. 
+  search for 7 in tree: start at root node: [ | | ] 
+  we see that it is a leaf node, so we insert 7 into node: [7| | ]
+
+  insert(14):
+  search for 14 in tree: start at root node, root node is leaf node, so we insert 
+  [7|14| ]
+
+  insert(18):
+  search for 18 in tree, get to root node, which is also a leaf node, so search terminates, so we insert 18 into leaf
+  [7|14|18]
+
+  insert(23):
+  search for 23, starting at root node, which is full, so we apply pre-emptive split to full root node.
+  splitting, we go into full node and take off the left part (7) and right part (18) and push the middle part(14)
+  into the parent level (there is no parent node since were pushing up from root, so we create and insert a new root level node above current level)
+  after splitting, we get: (note there are 2 null children, these are the two leftmost children)
+       [14 |  |  ]
+      /    |
+  [7| | ]  [18| | ]
+  now, we continue with our search by comparing 23 to 14. 23 is larger, so we insert to the right subtree of 14. we get: 
+       [14 |  |  ]
+      /    |
+  [7| | ]  [18|23| ]
+
+  insert(1):
+  we compare to the root node, 1 is less than 14, so we descend into left tree
+  since 1 is smaller than 7, we move 7 into middle positon of node and add 1 to leftmost pos. we get:
+       [14 |  |  ]
+      /    |
+  [1|7| ]  [18|23| ]
+
+  insert(11):
+  lookup at root node. compare 11 to 14. 11 is smaller, so we descend to leftmost subtree
+  we get to leaf node with open spot, so our search terminates and we insert 11 into the leaf node. we get:
+       [14 |  |  ]
+      /    |
+  [1|7|11]  [18|23| ]
+
+  insert(20):
+  lookup at root node: compare 20 to 14, it is greater, so we insert into second subtree of left node.
+  we get to a leaf node with an open spot, so our search terminates and insert 20 into the leaf node. we get:
+       [14 |  |  ]
+      /    |
+  [1|7|11]  [18|20|23]
+
+  insert(29):
+  lookup at root node: compare 29 to 14, it is greater, so we descend into second subtree
+  we see that leaf node is full, so we perform a pre-emptive split at the curernt node. 
+  the split pulls apart the left element (18) and right element (23) from the middle element (20).
+  20 is pushed into its parent node, the root node. so, we get:
+       [14 | 20 |  ]
+      /    |    |
+  [1|7|11]  [18| | ] [23| | ]
+  now we continue the lookup at the parent node that we pushed 20 into, which is the root node in this case.
+  comparing to 14, 29 is larger. comparing to 20, 29 is larger. so, we descend into the third child node.
+  we find a leaf node with open spots, so our search terminates and we insert 29. we get:
+       [14 | 20 |  ]
+      /    |    |
+  [1|7|11]  [18| | ] [23|29| ]
+
+  insert(25):
+  lookup for 25 starting at root: is greater than 14 and also 20, so descend to third child. 
+  third child has open spots, so we insert. we get:
+       [14 | 20 |  ]
+      /    |    |
+  [1|7|11]  [18| | ] [23|25|29]
+
+  insert 27:
+             [14 | 20 | 25]
+          /      |    |       \
+  [1|7|11]  [18| | ] [23| | ] [27|29| ]
+
+
+  insert 10:
+  we split the root node since search finds full node
+             [   20   |   |   ]
+          /           |
+       [14| | ]       [ 25 | | ]
+      /   |          /     |
+ [1|7|11] [18| | ] [23| | ] [27|29| ]
+  now we search again for a spot for 10, and we need to split [1|7|11]
+  push 7 up to the parent, leave 1, and move 11 to the next sibling to the right 
+             [       20       |   |   ]
+          /                   |
+       [7 |   14   | ]       [ 25    | | ]
+      /   |        |         /       |
+ [1| |] [10|11| ] [18| | ] [23| | ] [27|29| ]
+
+that's it for 2 3 4 trees
+
+
+====================
+
+Iterative In-Order Traversal
+
+To do this, we will use a helper data structure to help us keep track of the state of the traversal.
+This helper data structure is a stack. 
+
+          50
+     30         70
+  10    40    60
+    20      55  65
+
+Adding to the stack, we perform an inorder traversal, adding to stack each node we traverse.
+Start with root, and add to stack. Then traverse to left child and add to stack until we reach null left child.
+our stack is 50, 30, 10
+Now there's a null left child, we look at top of stack to see what node we have to look at the right child for.
+top of stack is 10. we visit and remove from stack 10, 
+traversing the right subtree we add 20. 
+20 has no children so we remove it and our next parent node is 30
+at 30, we remove it from stack and add right child to stack, 40. left subtree is empty, so now the stack tells us to visit 40.
+we visit 40, and view the right subtree and remove it from stack.
+now the stack is 50, so we visit 50 and goto right child: we push 70 onto stack and proceed to left subtree. 
+next we push 60 onto stack and go into left subtree, which we get 55. we push 55 onto stack.
+55 has no left subtree, so we look at top of stack to see waht parent node to visit: 55. 
+pull off 55 and visit 55. the subtree is empty at 55, so now we look at top of stack: 60.
+we visit 60 and pull of 60 from stack. we go into right subtree, and push 65 onto stack. 
+65 is left subtree is empty so we pull 65 off stack, visit it, and then step into right subtree. 
+that subtree is empty. Now the top of the stack is 70, so we visit 70. 
+pull 70 of the stack, and after visiting 70, we go to right subtree, which is empty. 
+going back to stack, it's now empty. now we terminate, and the list of what we visited is an inorder traversal. 
+
+Traversal with starting point 55:
+start inorder traversal by initing a stack. 
+to find the nodes we need to init stack with, we search for 55 in the tree, starting at root.
+for every node we come across in the search, we compare it to 55. 
+  if it is at least 55, we push it onto the stack. 
+  if it is smaller than 55, we continue search but dont push onto stack.
+starting search at 50, we dont add to stack. 
+then search steps to right subtree: node 70 -> add to stack. 
+then search steps to left subtree: node 60 -> add to stack. 
+search steps to left subtree: node 55 ->  add to stack.
+search steps into left subtree: null -> terminate search.
+now, our stack is init and is: 70, 60, 55.
+start our traversal from the top node of stack: 55. 
+visit and pop from stack 55. then goto right child: null, so return.
+visit and pop from stack 60. then goto right child: 65 -> we add 65 to stack, return.
+visit and pop from stack 65. there is no right subtree, so we return.
+last we visit and pop from stack 70. 70 has no right child, so we return. 
+now, our visited list is in sorted order. 
+
+Traversal with starting point 63 (note: 63 is not in the tree).
+start with BST search at root and an empty stack. 
+search starts at root: 50. 50<63 -> search goto right subtree, dont push onto stack.
+search goes to 70: 70>63 -> add to stack and search to left subtree
+search is now at 60: 60<63 -> search goes to right subtree, dont push onto stack.
+search now at 65: 65>63 -> search goes to left subtree, push onto stack. 
+search is at null node, so return search.
+now we start visiting. 
+visit and push off top of stack, 65. 65 has no right children so we return.
+now visit and push off stack 70. 70 has no right children, so we return.
+stack is empty now, so we terminate and we visited 65 and 70 (in that order).
+
+that's it.

@@ -1,0 +1,123 @@
+cs400 week 3 notes: Red-Black Tree ; SSH + Version Control
+==========
+5 Feb 2025
+Using JUnit testing
+
+setup JUnit
+$ wget https://pages.cs.wisc.edu/~cs400/junit5.jar
+
+run class with junit: 
+$ javac -cp junit5.jar:. MyClass.java
+$ java -jar junit5.jar -cp . -c MyClass
+
+add to java class file header:
+`import org.junit.jupiter.api.Test;`
+`import org.junit.jupiter.api.Assertions`
+
+must be a public instance method with a void return type
+with an annotation '@Test'.
+
+sample test method: 
+
+@Test
+public void testMyCode() {
+  // to manually use an if statement to fail: 
+  if (myCodeFails)
+    Assertions.fail("Fail message");
+
+  // to compare two values
+  Assertions.assertEquals(1, 2, "Fail message")
+
+  // to assert a boolean value
+  Assertions.assertTrue(false, "Fail message");
+}
+
+
+
+
+example test methods for a binary search tree:
+@Test 
+public void testSizeAfterInit() {
+  BinarySearchTree<Integer> tree = new BinarySearchTree<>();
+  int size = tree.size();
+  // arguments: (expectedValue, testedValue)
+  Assertions.assertEquals(0, size,
+  ".size() does not return 0 for an empty tree");
+}
+@Test
+public void testEmptyAfterInit() {
+  BinarySearchTree<Integer> tree = new BinarySearchTree<>();
+  boolean isEmpty = tree.isEmpty();
+  Assertions.assertTrue(isEmpty);
+}
+@Test 
+public void testInsertNPE() {
+  BinarySearchTree<Integer> tree = new BinarySearchTree<>();
+ 
+  // expecting an exception
+  try {
+    tree.insert(null);
+    Assertions.fail("expected a NullPointerException");
+  }
+  catch (NullPointerException e) {}
+}
+
+
+
+=============================
+Red-Black Tree Deletion
+  1. Delete value using BST deletion algo (3 cases) 
+  2. Check RBT properties and restore if necessary
+
+prof put up some examples but its trivial and nothing unique. look at slides on canvas to review. 
+
+
+
+=============================
+7 Feb 2025 lecture notes 
+
+command demo: 
+$ scp 
+
+csv demo
+
+If deleting a RED node or replacement node is RED, turn replacement BLACK 
+
+If deleting a BLACK node and replacement is BLACK
+good luck theres 4 subcases lol
+we look at the cousin not the aunt
+
+3 repair operations for when there is a removed black node and a replacement black, causing a double black node: 
+  sibling is black: 
+    sibling children are black: recolor operation
+      change double black (turns missing marker into regular null), 
+      change sibling from B to R, and add black weight to parent, changing parent from R to B or from B to double black. 
+    sibling children NOT both black: rotate&color swap (if red child of sibling, black sibling are misaligned w grandparent) -> rotate, color swap, recolor: 
+      (if misaligned, rotate red child, black sibling; color swap red child, black sibling)
+      rotate sibling node and its parent, 
+      remove the double black,
+      color swap sibling node and its parent, 
+      recolor red child of sibling to black
+  sibling is red: 
+    rotate sibling and parent 
+    color swap sibling and parent
+    now, we must repair the double black node that remains, using the new sibling that is no longer red. 
+missing black marker on root node -> additional rule: this marker can be removed from root anytime there is a double black root node. 
+
+
+
+Complexities of Repair Operations on RBTs
+insertion repair (red node has red child): 
+  O(1): (if misaligned: rotate R/R nodes), rotate & color swap
+  O(h): recolor, check tree again
+deletion repair (replacement is black and now there is double black): 
+  O(1): (if misaligned: rotate & color swap), rotate, color swap, recolor 
+  O(h): recolor, resolve tree again
+  O(1): rotate, color swap, resolve tree again
+
+Operations where runtime complexity is height dependent are because resolving/checking the tree again could cause issues until root is reached. 
+
+Complexities of RBT Operations: 
+Search:    O(h) = O(log_2(n))
+insertion: O(h) = O(log_2(n))
+deletion:  O(h) = O(log_2(n))

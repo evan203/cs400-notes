@@ -1,0 +1,99 @@
+prof name Flores
+cs400 week 1 - BST review + rotation, bash 
+
+======
+BST Review
+
+Nodes have:
+  0 (root) or 1 parent
+  0, 1, or 2 children
+
+For a parent node with a value A, 
+  the left subtree and all values in the left subtree are <= A
+  the right subtree and all values in the right subtree are > A
+
+The height of a tree is the number of nodes to the root, including the root 
+  ex: empty tree height=0, root height=1
+
+Insertion algorithm: insert value A into bst:
+1.) Lookup value A 
+    If not found & no children exist when searching, stop lookup
+2.) Create new node in position where no child exists. 
+
+Deletion algorithm: remove value A from bst:
+1.) Lookup value A 
+2.) if no children, just delete
+3.) if one child, replace with child to delete 
+4.) if two children, replace node with immediate predecessor
+    - to find predecessor, goto left subtree, then traverse right subtree 
+      recursively until a leaf, which is the predecessor
+
+BST time complexities - N=node count, H=height
+Search - O(H) or O(log_2(N))
+Insert - O(H) or O(log_2(N))
+Delete - O(H) or O(log_2(N))
+
+BST Height vs Node count 
+H    tree shape    max N
+0    empty tree    0
+1    root only     1
+2                  3
+3                  7
+4                  15
+
+Max number of nodes N in a tree of height H: 
+N=2^(H) - 1
+==> N + 1 = 2^H 
+==> log_2(N+1) = H
+
+BST rotations - to reshape an existing tree (sometimes to decrease H)
+Right rotation: example tree has root node of 30 and left child of 10
+we name the parent node P, and the child node C.
+there are also 3 different subtrees that could exist.
+on the C, left possible child is a, right is b.
+on the P, the possible subtree right child is c. 
+We are using right rotation because the parent has a left child 
+P moves to the right and downwards
+C moves up into the the position that P was in. 
+
+
+    (P)                      (C)
+   /   \     right          /   \
+  (C)   c    ======>       a    (P)
+ /  \        rot.               /  \
+a    b                         b    c
+
+
+Left rotation:
+assume a similar tree that is mirrored with parent P, child C and children a,b,c
+because there is a right child relationsip, we are rotating to the left. 
+
+    P                   C
+  a   C     =====>    P   c
+     b  c           a  b
+
+
+notice that: 
+subtree c stays on C's right 
+subtree b is the only one that moves 
+subtree a stays on P's left
+
+
+
+example: 
+
+    50              30
+  30        ===>  10  50
+10
+this was a right rotation, P=50, C=30, a=10, b=c=null
+
+
+    70             60
+  60     ====>  55    70
+55  65              65
+
+========
+lecture 2 
+========
+literally a bash tutorial lol no notes :)
+nah no == nano? 
