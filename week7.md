@@ -391,12 +391,11 @@ For weighted, connected, and undirected graphs.
 ```pseudocode
 kruskal(edgeList):
   sort edgeList
-  init nodeSets with singleton sets
+  forest = new set of trees
   while (!edgeList.isEmpty()):
     c = edgeList.removeFirst()
-    if (c.startNode and c.endNode in different nodeSets):
-      add c to tree
-      nodeSets.join(c.startNode, c.endNode)
+    if (c.startNode and c.endNode in different trees):
+      forest.joinAddEdge(c.startNode, c.endNode)
 ```
 
 Then florian goes through a walkthrough.
